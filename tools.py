@@ -28,7 +28,7 @@ def user_input(prompt, msg):
     return res
 
 def getdatabase():
-    print("\n[*] Dowloading the Database ...")
+    print("\n[*] Downloading the Database ...")
 
     db_filename='GeoLiteCity.dat'
     db_url='http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
