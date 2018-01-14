@@ -66,7 +66,6 @@ try:
         if args.ip is None:
             host = args.domain
             isDomain = True
-            print host
         else:
             host = args.ip[0]
 
