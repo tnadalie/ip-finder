@@ -14,13 +14,13 @@ db_url='http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
 db_filename='GeoLiteCity.dat'
 
 def getdatabase():
-    print("[*] Dowloading the Database ...")
+    print("\n[*] Dowloading the Database ...")
     if os.path.isfile('./' + db_filename) != True:
         filename = wget.download(db_url)
         print "\n[*] Uncompressing the Database ..."
         os.system('gzip -d ' + filename)
     else:
-        print("[*] Database already exists ...")
+        print("[*] Database already exists ...\n")
 
 def gethostbyname(host):
     try:
@@ -28,7 +28,9 @@ def gethostbyname(host):
         hostip = socket.gethostbyname(host)
         print "[*] %s's IP is %s" % (host, hostip)
     except Exception, e:
-        raise
+    	print("[*] Bad Host Name.")
+    	print("[*] Application Shutting Down.")
+    	sys.exit(1)
     return hostip
 
 def get_address_details(gip):
@@ -40,13 +42,13 @@ def get_address_details(gip):
         print " [->] %s: %s" % (key,val)
 
     try:
-        isGoogle = raw_input("\n[*] Do you want to use Google Map services to get a precise address [y/n]: ")
+        isGoogle = raw_input("\n[*] Do you want to use Google Maps services to get a precise address [Y/N]: ")
     except KeyboardInterrupt:
     	print("\n\n[*] User Requested An Interrupt.")
     	print("[*] Application Shutting Down.")
     	sys.exit(1)
 
-    if isGoogle in ['y', 'yes']:
+    if isGoogle in ['y', 'yes', 'Y']:
         url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + gapikey
         response  = get(url)
         json = response.json()
@@ -54,13 +56,15 @@ def get_address_details(gip):
         if json['results']:
             data = json['results'][0]
             print " [->] address: %s" % (data.get('formatted_address', None))
+        else:
+        	print("[*] Can't retrieve data from Google Maps API.")
+        	print("[*] Application Shutting Down.")
+        	sys.exit(1)
     return
 
-
-print("[*] Starting ...")
 if len(sys.argv) == 1:
     try:
-    	host = raw_input("[*] Enter Host Target IP Address/Host Name: ")
+    	host = raw_input("\n[*] Enter Host Target IP Address/Host Name: ")
     except KeyboardInterrupt:
     	print("\n\n[*] User Requested An Interrupt.")
     	print("[*] Application Shutting Down.")
@@ -73,4 +77,3 @@ if host.endswith(('.com','.fr','.org','.net','.mx','.ca')):
 
 getdatabase()
 get_address_details(pygeoip.GeoIP('./' + db_filename))
-print("\n[*] Script finished ...")
