@@ -3,31 +3,21 @@ from argv_parser import findip_argparser
 from requests import get
 import pygeoip
 import socket
+import tools
 import json
 import wget
 import sys
-import os
 
 host = ''
 gip = ''
-gapikey='AIzaSyDjl0muK7MOEJLN2vv3NnVQNOquI_0zGGI'
+gapikey=''
 db_url='http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
-db_filename='GeoLiteCity.dat'
 
-def getdatabase():
-    print("\n[*] Dowloading the Database ...")
-    if os.path.isfile('./' + db_filename) != True:
-        filename = wget.download(db_url)
-        print "\n[*] Uncompressing the Database ..."
-        os.system('gzip -d ' + filename)
-    else:
-        print("[*] Database already exists ...\n")
-
-def gethostbyname(host):
+def gethostbyname():
     try:
         print "[*] Converting Host Name [%s] to IP ..." % (host)
         hostip = socket.gethostbyname(host)
-        print "[*] %s's IP is %s" % (host, hostip)
+        print "[*] IP is %s" % (host)
     except Exception, e:
     	print("[*] Bad Host Name.")
     	print("[*] Application Shutting Down.")
@@ -50,6 +40,9 @@ def get_address_details(gip):
     isGoogle = raw_input("\n[*] Do you want to use Google Maps services to get a precise address [Y/N]: ")
 
     if isGoogle in ['y', 'yes', 'Y']:
+        if tools.isFileExists('./apikey.txt') != True:
+            gapikey = tools.create_google_apikey()
+        gapikey = tools.read_apikey()
         url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + gapikey
         response  = get(url)
         json = response.json()
@@ -64,21 +57,19 @@ def get_address_details(gip):
     return
 
 try:
-
-
     if len(sys.argv) == 1:
-    	host = raw_input("\n[*] Enter Host Target IP Address/Host Name: ")
+    	host = user_input("[*]","Enter Host Target IP Address/Host Name")
     else:
         args = findip_argparser()
         if args.ip is None:
-            host = args.domain[0]
-            host = gethostbyname(host)
+            host = args.domain
+            host = gethostbyname()
+            print host
         else:
-            print args.ip
             host = args.ip[0]
 
-    getdatabase()
-    get_address_details(pygeoip.GeoIP('./' + db_filename))
+
+    get_address_details(pygeoip.GeoIP('./' + tools.getdatabase()))
 except KeyboardInterrupt:
 	print("\n\n[*] User Requested An Interrupt.")
 	print("[*] Application Shutting Down.")
