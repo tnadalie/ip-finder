@@ -9,15 +9,14 @@ import wget
 import sys
 
 host = ''
-gip = ''
+gip = None
 gapikey=''
-db_url='http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
 
 def gethostbyname():
     try:
         print "[*] Converting Host Name [%s] to IP ..." % (host)
         hostip = socket.gethostbyname(host)
-        print "[*] IP is %s" % (host)
+        print "[*] IP is %s" % (hostip)
     except Exception, e:
     	print("[*] Bad Host Name.")
     	print("[*] Application Shutting Down.")
@@ -40,7 +39,7 @@ def get_address_details(gip):
     isGoogle = raw_input("\n[*] Do you want to use Google Maps services to get a precise address [Y/N]: ")
 
     if isGoogle in ['y', 'yes', 'Y']:
-        if tools.isFileExists('./apikey.txt') != True:
+        if tools.isFileExists('./conf/google-apikey') != True:
             gapikey = tools.create_google_apikey()
         gapikey = tools.read_apikey()
         url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + gapikey
@@ -57,18 +56,22 @@ def get_address_details(gip):
     return
 
 try:
+    isDomain = None
     if len(sys.argv) == 1:
-    	host = user_input("[*]","Enter Host Target IP Address/Host Name")
+    	host = tools.user_input("[*]","Enter Host Target IP Address/Host Name")
+        if (tools.isAlpha(host)):
+            isDomain = True
     else:
         args = findip_argparser()
         if args.ip is None:
             host = args.domain
-            host = gethostbyname()
+            isDomain = True
             print host
         else:
             host = args.ip[0]
 
-
+    if isDomain is True:
+        host = gethostbyname()
     get_address_details(pygeoip.GeoIP('./' + tools.getdatabase()))
 except KeyboardInterrupt:
 	print("\n\n[*] User Requested An Interrupt.")
