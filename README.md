@@ -1,6 +1,29 @@
 # ip-finder
 
 *Python module used to retrieve a postal address from an IP or a Domain Name*
+*Working on Debian
+
+
+### Prerequisites
+
+The following packages are required to be able download the project and install its dependencies:
+
+**apt-get**
+```
+apt-get -y install sudo python wget unzip
+```
+
+**yum**
+```
+yum -y install sudo python wget unzip
+```
+
+Download the project's archive from the github repository and then unzip it:
+```
+wget https://github.com/tnadalie/ip-finder/archive/master.zip
+unzip master.zip
+```
+
 
 ### Installing
 
