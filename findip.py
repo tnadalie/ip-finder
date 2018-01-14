@@ -1,4 +1,5 @@
 #/usr/bin/en python
+from argv_parser import findip_argparser
 from requests import get
 import pygeoip
 import socket
@@ -35,18 +36,18 @@ def gethostbyname(host):
 
 def get_address_details(gip):
     rec = gip.record_by_addr(host)
+
+    if rec is None:
+    	print("[*] Can't retrieve data from MaxMind DB.")
+    	print("[*] Application Shutting Down.")
+    	sys.exit(1)
     lat = str(rec.get('latitude'))
     lng = str(rec.get('longitude'))
 
     for key,val in rec.items():
         print " [->] %s: %s" % (key,val)
 
-    try:
-        isGoogle = raw_input("\n[*] Do you want to use Google Maps services to get a precise address [Y/N]: ")
-    except KeyboardInterrupt:
-    	print("\n\n[*] User Requested An Interrupt.")
-    	print("[*] Application Shutting Down.")
-    	sys.exit(1)
+    isGoogle = raw_input("\n[*] Do you want to use Google Maps services to get a precise address [Y/N]: ")
 
     if isGoogle in ['y', 'yes', 'Y']:
         url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lng + '&key=' + gapikey
@@ -62,18 +63,23 @@ def get_address_details(gip):
         	sys.exit(1)
     return
 
-if len(sys.argv) == 1:
-    try:
+try:
+
+
+    if len(sys.argv) == 1:
     	host = raw_input("\n[*] Enter Host Target IP Address/Host Name: ")
-    except KeyboardInterrupt:
-    	print("\n\n[*] User Requested An Interrupt.")
-    	print("[*] Application Shutting Down.")
-    	sys.exit(1)
-else:
-    host = sys.argv[1]
+    else:
+        args = findip_argparser()
+        if args.ip is None:
+            host = args.domain[0]
+            host = gethostbyname(host)
+        else:
+            print args.ip
+            host = args.ip[0]
 
-if host.endswith(('.com','.fr','.org','.net','.mx','.ca')):
-    host = gethostbyname(host)
-
-getdatabase()
-get_address_details(pygeoip.GeoIP('./' + db_filename))
+    getdatabase()
+    get_address_details(pygeoip.GeoIP('./' + db_filename))
+except KeyboardInterrupt:
+	print("\n\n[*] User Requested An Interrupt.")
+	print("[*] Application Shutting Down.")
+	sys.exit(1)
