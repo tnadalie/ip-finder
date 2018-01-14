@@ -1,0 +1,8 @@
+# conf files
+conf/
+
+# parsed files
+*.pyc
+
+# DB
+GeoLiteCity.dat
