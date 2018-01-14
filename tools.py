@@ -1,4 +1,5 @@
 #/usr/bin/en python
+import wget
 import sys
 import os
 import re

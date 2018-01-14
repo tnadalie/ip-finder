@@ -5,7 +5,6 @@ import pygeoip
 import socket
 import tools
 import json
-import wget
 import sys
 
 host = ''
