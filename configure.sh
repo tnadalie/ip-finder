@@ -2,7 +2,7 @@
 echo -e "[*] Starting ...\n"
 
 # check if distrib is centos
-OS=[[ command -v yum ]]
+OS=$(command -v yum)
 
 echo -e "[*] Installing dependencies ...\n"
 if [ ${#OS} -ge 1 ]; then
